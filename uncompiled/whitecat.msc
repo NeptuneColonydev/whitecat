@@ -1,1 +1,81 @@
+using System;
+using Console;
+using Net;
+using Event;
+using Application;
+using String;
+using Firewall;
+using Player;
 
+StringResult admin = Application.RequestAdminPrivilege();
+if(admin.GetResult() == false){
+    Console.WriteLine("[Error]: "..admin.GetString());
+    Application.Exit();
+}
+
+include "ranStr.mscx";
+randomPass genPass = new randomPass();
+
+string steamID = System.GetUserSteamID();
+bool sysLock = false;
+
+function startUp(){
+    string pass = genPass.genPass();
+    
+    System.RunCommand("router settings admin_password "..pass);
+    System.RunCommand("router login "..pass);
+    Console.Clear();
+    
+    System.RunCommand("router settings hide_terminals true");
+    Firewall.Enable();
+    System.RunCommand("router firewall block MN_PROTOCOL_REMOTE in");
+    System.RunCommand("router firewall block MN_PROTOCOL_REMOTE_ATTEMPT in");
+    System.RunCommand("router firewall block MN_PROTOCOL_MANAGER_SCAN in");
+    System.RunCommand("router firewall block MN_PROTOCOL_REMOTE_COMMAND in");
+    Console.Clear();
+}
+startUp();
+
+function OnNetworkMessageReceived(number protocol, NTM message){
+    string sourceIP = message.GetSourceAddress();
+    if(protocol == 1){
+        Firewall.Block(sourceIP);
+    }
+    if(protocol == 120){
+        Firewall.Block(sourceIP);
+    }
+    if(protocol == 122){
+        Firewall.Block(sourceIP);
+    }
+}
+
+function OnPlayerStartedUsing(Player ply){
+    string plyID = ply.GetSteamID();
+    if(plyID == steamID){
+        sysLock = false;
+        Console.WriteLine("Autherized User: "..ply.GetName().."\nAccess Granted!");
+    }
+    else{
+        sysLock = true;
+    }
+}
+
+function OnConsoleCommand(string command){
+    if(sysLock){
+        Console.ReadLine();
+    }
+}
+
+Event.AddListener("ConsoleCommand", "input", "OnConsoleCommand");
+Event.AddListener("PlayerStartedUsing", "using", "OnPlayerStartedUsing");
+Event.AddListener("IncomingNTM", "incoming_ntm", "OnNetworkMessageReceived");
+
+while(true){
+    if(System.HasPeripheral("unlocker")){
+        System.Shutdown();
+    }
+    if(sysLock){
+        System.Lock();
+    }
+    Event.Process();
+}
