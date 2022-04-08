@@ -60,14 +60,14 @@ function OnPlayerStartedUsing(Player ply){
     }
 }
 
-function OnConsoleCommand(string command){
-    if(sysLock){
-        Console.ReadLine();
-    }
+function OnPlayerStoppedUsing(Player ply){
+    System.Lock();
+    sysLock = true;
+    Console.Clear();
 }
 
-Event.AddListener("ConsoleCommand", "input", "OnConsoleCommand");
 Event.AddListener("PlayerStartedUsing", "using", "OnPlayerStartedUsing");
+Event.AddListener("PlayerStoppedUsing", "using", "OnPlayerStoppedUsing");
 Event.AddListener("IncomingNTM", "incoming_ntm", "OnNetworkMessageReceived");
 
 while(true){
