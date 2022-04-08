@@ -1,1 +1,25 @@
+using String;
+using Math;
 
+class randomPass{
+    string[] lower = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+    string[] higher = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];  
+
+    function<string> genPass(){
+        string pass;
+        number count = 1;
+        
+        while(count <= 16){
+            number ranTable = Math.Random();
+            number ranIndex = Math.RandomRange(1,26);
+            if(ranTable == 0){
+                pass = pass..lower[ranIndex];
+            }
+            else{
+                pass = pass..higher[ranIndex];
+            }
+            count = count + 1;
+        }
+        return pass;
+    }
+}
