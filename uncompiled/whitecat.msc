@@ -7,6 +7,8 @@ using String;
 using Firewall;
 using Player;
 
+Application.CreateDesktopIcon("https://i.imgur.com/tbcxOls.png");
+
 StringResult admin = Application.RequestAdminPrivilege();
 if(admin.GetResult() == false){
     Console.WriteLine("[Error]: "..admin.GetString());
